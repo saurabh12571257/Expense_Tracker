@@ -10,7 +10,6 @@ A modern web application to track your income and expenses, providing analytics 
 - User-friendly UI for adding income and expenses
 - Dashboard with analytics and category breakdown
 - Expense tracking by categories
-- Monthly trend visualization
 - Recent transactions list
 
 ## Tech Stack
