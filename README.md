@@ -1,5 +1,8 @@
 # Expense Tracker
 
+<img width="1468" alt="Screenshot 2025-03-14 at 10 30 29 PM" src="https://github.com/user-attachments/assets/ca729018-700f-43e6-94e5-2fe93844acb1" />
+
+
 A modern web application to track your income and expenses, providing analytics on your spending habits and helping you manage your finances efficiently.
 
 ## Features
