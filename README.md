@@ -65,7 +65,3 @@ expense-tracker/
 - Budget setting and alerts
 - Export reports as PDF/CSV
 - Mobile app version
-
-## License
-
-MIT
