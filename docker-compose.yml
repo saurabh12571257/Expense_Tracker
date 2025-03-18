@@ -2,9 +2,7 @@ version: '3.8'
 
 services:
   frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend
+    image: saurabhdave59/expense-tracker-frontend:latest
     ports:
       - "80:80"
     depends_on:
@@ -12,16 +10,14 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
     env_file:
-      - .env.example
+      - .env
     networks:
       - app-network
 
   backend:
-    build:
-      context: .
-      dockerfile: Dockerfile.backend
+    image: saurabhdave59/expense-tracker-backend:latest
     env_file:
-      - tracker-backend/.env.example
+      - tracker-backend/.env
     ports:
       - "5002:5002"
     networks:

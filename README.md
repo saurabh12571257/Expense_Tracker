@@ -67,3 +67,36 @@ expense-tracker/
 - Budget setting and alerts
 - Export reports as PDF/CSV
 - Mobile app version
+
+## Docker Deployment
+
+This application can be easily deployed using Docker:
+
+1. **Prerequisites**
+   - Docker
+   - Docker Compose
+
+2. **Setup**
+   ```bash
+   # Clone the repository
+   git clone https://github.com/saurabh12571257/Expense_Tracker.git
+   cd Expense_Tracker
+
+   # Create environment files from templates
+   cp .env.example .env
+   cp tracker-backend/.env.example tracker-backend/.env
+   
+   # Edit tracker-backend/.env to add your database credentials
+   nano tracker-backend/.env
+   ```
+
+3. **Deploy**
+   ```bash
+   docker-compose up -d
+   ```
+
+4. **Access**
+   - Frontend: http://localhost
+   - Backend API: http://localhost/api
+
+For more details, see [DOCKER-GUIDE.md](DOCKER-GUIDE.md).
