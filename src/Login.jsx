@@ -14,7 +14,9 @@ function Login({ onLogin, onRegisterClick }) {
     }
     
     try {
-      const response = await fetch('http://localhost:5002/api/auth/login', {
+      // Use environment variable or fallback to localhost
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5002';
+      const response = await fetch(`${apiUrl}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

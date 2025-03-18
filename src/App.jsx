@@ -730,7 +730,7 @@ function App() {
             </div>
             
             <div className="space-y-4">
-              <div>
+      <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Savings Goal Amount</label>
                 <input
                   type="number"
@@ -852,7 +852,7 @@ function App() {
                 </div>
               )}
             </div>
-          </div>
+      </div>
 
           {/* Savings Goal Tracker */}
           <div className="bg-white rounded-lg shadow-md p-6">
@@ -863,7 +863,7 @@ function App() {
                 onClick={handleOpenEditSavingsGoalModal}
               >
                 Edit Goal
-              </button>
+        </button>
             </div>
             
             <div className="mb-4">
@@ -946,7 +946,7 @@ function App() {
           </div>
         </div>
       </main>
-    </div>
+      </div>
   )
 }
 

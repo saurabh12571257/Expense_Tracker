@@ -1,0 +1,16 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY tracker-backend/package*.json ./
+
+# Install dependencies
+RUN npm ci
+
+COPY tracker-backend/ .
+
+RUN touch .env
+
+EXPOSE 5002
+
+CMD ["npm", "run", "dev"] 
