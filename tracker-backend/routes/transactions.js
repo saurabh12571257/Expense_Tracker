@@ -42,10 +42,8 @@ router.post('/', auth, async (req, res) => {
     const { description, amount, category, date, type } = req.body;
     const userId = req.user.id;
     
-    // Determine transaction type based on amount if not provided
     const transactionType = type || (amount >= 0 ? 'income' : 'expense');
     
-    // Get the user's primary account
     const accountResult = await pool.query(
       'SELECT id FROM accounts WHERE user_id = $1 LIMIT 1',
       [userId]
@@ -53,7 +51,7 @@ router.post('/', auth, async (req, res) => {
     
     let accountId = null;
     
-    // If no account exists, create one
+    // If no account exists, create one (just one "Primary Account")
     if (accountResult.rows.length === 0) {
       const newAccountResult = await pool.query(
         'INSERT INTO accounts (user_id, name, balance, account_type) VALUES ($1, $2, $3, $4) RETURNING id',

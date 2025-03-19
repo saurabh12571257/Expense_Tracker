@@ -135,9 +135,7 @@ function App() {
         const initials = emailName.substring(0, 2).toUpperCase();
         
         setUser({
-          name: userData.first_name && userData.last_name 
-            ? `${userData.first_name} ${userData.last_name}` 
-            : emailName,
+          name: emailName,
           initials: initials,
           profileColor: 'bg-indigo-700'
         });

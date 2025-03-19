@@ -14,9 +14,13 @@ function Login({ onLogin, onRegisterClick }) {
     }
     
     try {
+      console.log('Attempting login with:', { email });
+      
       // Use environment variable or fallback to localhost
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5002';
-      const response = await fetch(`${apiUrl}/auth/login`, {
+      console.log('Using API URL:', `${apiUrl}/api/auth/login`);
+      
+      const response = await fetch(`${apiUrl}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -27,10 +31,12 @@ function Login({ onLogin, onRegisterClick }) {
         }),
       });
       
+      console.log('Response status:', response.status);
       const data = await response.json();
+      console.log('Response data:', data);
       
       if (!response.ok) {
-        setError(data.message);
+        setError(data.message || 'Login failed');
         return;
       }
       
@@ -40,6 +46,7 @@ function Login({ onLogin, onRegisterClick }) {
       // Call the onLogin function with the user data
       onLogin({ email: data.user.email });
     } catch (err) {
+      console.error('Login error:', err);
       setError('Server error. Please try again.');
     }
   };

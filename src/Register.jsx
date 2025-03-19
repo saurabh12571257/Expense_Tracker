@@ -20,25 +20,29 @@ function Register({ onRegister }) {
     }
     
     try {
+      console.log('Attempting registration with:', { email });
+      
       // Use environment variable or fallback to localhost
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5002';
-      const response = await fetch(`${apiUrl}/auth/register`, {
+      console.log('Using API URL:', `${apiUrl}/api/auth/register`);
+      
+      const response = await fetch(`${apiUrl}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           email,
-          password,
-          first_name: '',
-          last_name: ''
+          password
         }),
       });
       
+      console.log('Response status:', response.status);
       const data = await response.json();
+      console.log('Response data:', data);
       
       if (!response.ok) {
-        setError(data.message);
+        setError(data.message || 'Registration failed');
         return;
       }
       
@@ -48,6 +52,7 @@ function Register({ onRegister }) {
       // Redirect to dashboard or login
       onRegister({ email: data.user.email });
     } catch (err) {
+      console.error('Registration error:', err);
       setError('Server error. Please try again.');
     }
   };

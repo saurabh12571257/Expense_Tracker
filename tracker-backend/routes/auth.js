@@ -7,7 +7,7 @@ const pool = require('../db');
 // Register User
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, first_name, last_name } = req.body;
+    const { email, password } = req.body;
     
     // Check if user already exists
     const userCheck = await pool.query(
@@ -25,8 +25,8 @@ router.post('/register', async (req, res) => {
     
     // Insert new user
     const newUser = await pool.query(
-      'INSERT INTO users (email, password_hash, first_name, last_name) VALUES ($1, $2, $3, $4) RETURNING id, email',
-      [email, hashedPassword, first_name || '', last_name || '']
+      'INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id, email',
+      [email, hashedPassword]
     );
     
     // Create default account for user
@@ -73,7 +73,7 @@ router.post('/login', async (req, res) => {
     );
     
     if (user.rows.length === 0) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: 'Register first' });
     }
     
     // Verify password
@@ -100,9 +100,7 @@ router.post('/login', async (req, res) => {
       token,
       user: {
         id: user.rows[0].id,
-        email: user.rows[0].email,
-        first_name: user.rows[0].first_name,
-        last_name: user.rows[0].last_name
+        email: user.rows[0].email
       }
     });
   } catch (err) {
