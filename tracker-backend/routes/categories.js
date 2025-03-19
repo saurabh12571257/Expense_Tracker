@@ -25,7 +25,6 @@ router.get('/', auth, async (req, res) => {
       id: category.id,
       name: category.name,
       color: category.color || 'bg-gray-500',
-      icon: category.icon || '',
       budget: parseFloat(category.budget || 0),
       amount: parseFloat(category.total_amount || 0),
       created_at: category.created_at
@@ -41,7 +40,7 @@ router.get('/', auth, async (req, res) => {
 // Add a new category
 router.post('/', auth, async (req, res) => {
   try {
-    const { name, color, icon } = req.body;
+    const { name, color } = req.body;
     const userId = req.user.id;
     
     // Check if category already exists in the global categories table
@@ -67,8 +66,8 @@ router.post('/', auth, async (req, res) => {
     } else {
       // Insert new category in the global categories table
       const newCategory = await pool.query(
-        'INSERT INTO categories (name, color, icon) VALUES ($1, $2, $3) RETURNING *',
-        [name, color || 'bg-gray-500', icon || '']
+        'INSERT INTO categories (name, color) VALUES ($1, $2) RETURNING *',
+        [name, color || 'bg-gray-500']
       );
       
       categoryId = newCategory.rows[0].id;
@@ -85,7 +84,6 @@ router.post('/', auth, async (req, res) => {
         id: categoryId,
         name,
         color: color || 'bg-gray-500',
-        icon: icon || '',
         budget: 0,
         amount: 0
       }
