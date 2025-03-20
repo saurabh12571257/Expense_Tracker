@@ -50,8 +50,9 @@ npm run dev
 expense-tracker/
 ├── public/
 ├── src/
-│   ├── assets/
 │   ├── App.jsx         # Main application component
+│   ├── Login.jsx       # Login component
+│   ├── Register.jsx    # Registration component
 │   ├── index.css       # Global styles with Tailwind directives
 │   └── main.jsx        # Application entry point
 ├── index.html
