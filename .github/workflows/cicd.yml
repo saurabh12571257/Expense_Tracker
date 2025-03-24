@@ -30,14 +30,34 @@ jobs:
         username: ubuntu
         key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
         script: |
+          # Setup SSH known hosts
           mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
           echo "StrictHostKeyChecking no" >> ~/.ssh/config
           chmod 600 ~/.ssh/config
+
+          # Install Docker if not installed
+          if ! command -v docker &> /dev/null; then
+            echo "Docker not found. Installing..."
+            sudo apt update && sudo apt install -y docker.io
+            sudo systemctl start docker
+            sudo systemctl enable docker
+            sudo usermod -aG docker $USER
+            newgrp docker
+          else
+            echo "Docker is already installed."
+          fi
+
+          # Pull new Docker images
           docker pull ${{ secrets.DOCKER_IMAGE_NAME_FRONTEND }}
           docker pull ${{ secrets.DOCKER_IMAGE_NAME }}
+
+          # Restart backend container
           docker stop tracker-backend || true
           docker rm tracker-backend || true
           docker run -d --name tracker-backend -p 3000:3000 ${{ secrets.DOCKER_IMAGE_NAME }}
+
+          # Restart frontend container
           docker stop tracker-frontend || true
           docker rm tracker-frontend || true
           docker run -d --name tracker-frontend -p 3001:3001 ${{ secrets.DOCKER_IMAGE_NAME_FRONTEND }}
