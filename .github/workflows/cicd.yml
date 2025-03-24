@@ -22,14 +22,6 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build Docker image
-      run: |
-        docker build -t ${{ secrets.DOCKER_IMAGE_NAME }} .
-
-    - name: Push Docker image to Docker Hub
-      run: |
-        docker push ${{ secrets.DOCKER_IMAGE_NAME }}
-
     - name: SSH into EC2 and update Docker container
       uses: appleboy/ssh-action@master
       with:
