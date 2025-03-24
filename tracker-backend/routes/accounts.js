@@ -6,10 +6,9 @@ const auth = require('../middleware/auth');
 // Get all accounts for a user
 router.get('/', auth, async (req, res) => {
   try {
-    // Get user ID from the auth middleware
+   
     const userId = req.user.id;
     
-    // Query the database for user's accounts
     const accountsResult = await pool.query(
       'SELECT * FROM accounts WHERE user_id = $1 ORDER BY name',
       [userId]
