@@ -17,6 +17,7 @@ A modern web application to track your income and expenses, providing analytics 
 - **Frontend**: React.js with Tailwind CSS
 - **State Management**: React Hooks (useState)
 
+
 ## Getting Started
 
 ### Prerequisites
