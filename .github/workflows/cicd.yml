@@ -30,6 +30,9 @@ jobs:
         username: ubuntu
         key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
         script: |
+          mkdir -p ~/.ssh
+          echo "StrictHostKeyChecking no" >> ~/.ssh/config
+          chmod 600 ~/.ssh/config
           docker pull ${{ secrets.DOCKER_IMAGE_NAME_FRONTEND }}
           docker pull ${{ secrets.DOCKER_IMAGE_NAME }}
           docker stop tracker-backend || true
