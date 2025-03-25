@@ -23,11 +23,11 @@ jobs:
         cache: 'npm'
 
     - name: Install frontend dependencies
-      run: npm ci
+      run: npm install
       
     - name: Install backend dependencies
       working-directory: ./tracker-backend
-      run: npm ci
+      run: npm install
       
     - name: Lint and build (non-blocking)
       run: |
