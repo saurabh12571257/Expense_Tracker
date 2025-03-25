@@ -46,16 +46,12 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build and push Docker images
+    - name: Build and push Docker image
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: |
-        # Build and push backend image
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/expense-tracker-backend:latest -f Dockerfile.backend .
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/expense-tracker-backend:latest
-        
-        # Build and push frontend image
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/expense-tracker-frontend:latest -f Dockerfile.frontend .
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/expense-tracker-frontend:latest
+        # Build and push the single combined image
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/expense-tracker:latest .
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/expense-tracker:latest
 
     - name: Deploy to EC2
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -67,13 +63,12 @@ jobs:
         script: |
           echo "Starting deployment process..."
           
-          # Pull the latest images
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/expense-tracker-backend:latest
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/expense-tracker-frontend:latest
+          # Pull the latest image
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/expense-tracker:latest
           
           # Stop and remove existing containers
-          docker stop expense-tracker-backend expense-tracker-frontend || true
-          docker rm expense-tracker-backend expense-tracker-frontend || true
+          docker stop expense-tracker expense-tracker-backend expense-tracker-frontend || true
+          docker rm expense-tracker expense-tracker-backend expense-tracker-frontend || true
           
           # Run PostgreSQL if not already running
           if ! docker ps | grep postgres-db; then
@@ -87,10 +82,11 @@ jobs:
               postgres:13
           fi
           
-          # Run the backend container
+          # Run the combined container
           docker run -d \
-            --name expense-tracker-backend \
+            --name expense-tracker \
             -p 5002:5002 \
+            -p 80:3000 \
             -e DB_HOST=${{ secrets.DB_HOST }} \
             -e DB_PORT=${{ secrets.DB_PORT }} \
             -e DB_NAME=${{ secrets.DB_NAME }} \
@@ -98,15 +94,8 @@ jobs:
             -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
             -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
             -e PORT=5002 \
-            --restart unless-stopped \
-            ${{ secrets.DOCKERHUB_USERNAME }}/expense-tracker-backend:latest
-          
-          # Run the frontend container
-          docker run -d \
-            --name expense-tracker-frontend \
-            -p 80:80 \
             -e VITE_API_URL=http://${{ secrets.EC2_HOST }}:5002 \
             --restart unless-stopped \
-            ${{ secrets.DOCKERHUB_USERNAME }}/expense-tracker-frontend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/expense-tracker:latest
           
           echo "Deployment completed successfully!"
