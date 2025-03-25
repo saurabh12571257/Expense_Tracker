@@ -103,7 +103,7 @@ function App() {
   // Update categories whenever transactions change
   useEffect(() => {
     updateCategoriesFromTransactions();
-  }, [updateCategoriesFromTransactions]);
+  }, [recentTransactions, categoryColors]);
 
   // Check for existing token on component mount
   useEffect(() => {

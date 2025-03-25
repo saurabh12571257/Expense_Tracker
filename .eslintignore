@@ -1,0 +1,17 @@
+# Output directories
+dist/
+build/
+coverage/
+
+# Node modules
+node_modules/
+
+# Backend files (handled separately)
+tracker-backend/
+
+# Environment files
+.env
+.env.*
+
+# Configuration files
+*.config.js 

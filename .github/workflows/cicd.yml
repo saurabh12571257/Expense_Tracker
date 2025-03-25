@@ -29,8 +29,11 @@ jobs:
       working-directory: ./tracker-backend
       run: npm ci
       
-    - name: Run frontend linting (with warnings as info only)
-      run: npm run lint || true
+    - name: Run frontend linting
+      run: npm run lint:frontend || echo "Frontend lint issues found"
+      
+    - name: Run backend linting (non-blocking)
+      run: npm run lint:backend || echo "Backend lint issues found, but continuing build"
       
     - name: Run frontend tests
       run: npm test || echo "No test script found"
