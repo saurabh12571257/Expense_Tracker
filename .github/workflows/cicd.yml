@@ -30,7 +30,9 @@ jobs:
       run: npm ci
       
     - name: Run frontend linting
-      run: npm run lint || echo "No lint script found"
+      run: |
+        npm install eslint-plugin-react eslint-plugin-react-hooks --no-save
+        npm run lint || echo "Linting failed but continuing"
       
     - name: Run frontend tests
       run: npm test || echo "No test script found"

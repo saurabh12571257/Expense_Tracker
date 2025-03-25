@@ -5,10 +5,10 @@ import Register from './Register'
 function App() {
   // Authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userEmail, setUserEmail] = useState('');
+  const [_userEmail, setUserEmail] = useState('');
   const [showRegister, setShowRegister] = useState(false);
   const [token, setToken] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [_isLoading, setIsLoading] = useState(false);
   
   // Reset data to zero values
   const [balance, setBalance] = useState(0);
@@ -63,11 +63,6 @@ function App() {
     'Others'
   ];
 
-  // Update categories whenever transactions change
-  useEffect(() => {
-    updateCategoriesFromTransactions();
-  }, [recentTransactions]);
-
   const updateCategoriesFromTransactions = () => {
     // Filter out income transactions
     const expenseTransactions = recentTransactions.filter(transaction => transaction.amount < 0);
@@ -85,23 +80,23 @@ function App() {
       categoryMap[category] += Math.abs(transaction.amount);
     });
     
-    // Create updated categories array
-    const updatedCategories = Object.keys(categoryMap).map(name => {
-      const amount = categoryMap[name];
-      const percentage = totalExpenses > 0 ? Math.round((amount / totalExpenses) * 100) : 0;
-      return {
-        name,
-        amount,
-        percentage,
-        color: categoryColors[name] || 'bg-gray-500' // Default color if not in mapping
-      };
-    });
+    // Convert to array of category objects
+    const updatedCategories = Object.keys(categoryMap).map(name => ({
+      name,
+      amount: categoryMap[name],
+      percentage: totalExpenses ? (categoryMap[name] / totalExpenses) * 100 : 0
+    }));
     
     // Sort by amount (highest first)
     updatedCategories.sort((a, b) => b.amount - a.amount);
     
     setCategories(updatedCategories);
   };
+
+  // Update categories whenever transactions change
+  useEffect(() => {
+    updateCategoriesFromTransactions();
+  }, [recentTransactions, updateCategoriesFromTransactions]);
 
   // Check for existing token on component mount
   useEffect(() => {
