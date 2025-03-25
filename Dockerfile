@@ -9,7 +9,8 @@ RUN npm install
 
 # Copy frontend source code
 COPY src/ ./src/
-COPY public/ ./public/
+# Create public directory if it doesn't exist instead of copying
+RUN mkdir -p ./public
 COPY index.html vite.config.js postcss.config.js ./
 COPY .eslintrc.js eslint.config.js ./
 
