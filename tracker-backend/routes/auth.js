@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const pool = require('../db');
 
@@ -19,9 +19,11 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
     
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    // Hash password using SHA-256
+    const hashedPassword = crypto
+      .createHash('sha256')
+      .update(password)
+      .digest('hex');
     
     // Insert new user
     const newUser = await pool.query(
@@ -56,7 +58,6 @@ router.post('/register', async (req, res) => {
       }
     });
   } catch (err) {
-    console.error(err.message);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -76,10 +77,14 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Register first' });
     }
     
-    // Verify password
-    const isMatch = await bcrypt.compare(password, user.rows[0].password_hash);
+    // Hash the provided password using SHA-256
+    const hashedPassword = crypto
+      .createHash('sha256')
+      .update(password)
+      .digest('hex');
     
-    if (!isMatch) {
+    // Compare hashed passwords
+    if (hashedPassword !== user.rows[0].password_hash) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
     
@@ -104,7 +109,6 @@ router.post('/login', async (req, res) => {
       }
     });
   } catch (err) {
-    console.error(err.message);
     res.status(500).json({ message: 'Server error' });
   }
 });

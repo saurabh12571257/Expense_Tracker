@@ -1,104 +1,89 @@
 # Expense Tracker
 
-<img width="1468" alt="Screenshot 2025-03-14 at 10 30 29 PM" src="https://github.com/user-attachments/assets/ca729018-700f-43e6-94e5-2fe93844acb1" />
-
-
-A modern web application to track your income and expenses, providing analytics on your spending habits and helping you manage your finances efficiently.
+A full-stack application for tracking personal expenses with categories, transactions, and dashboards.
 
 ## Features
 
-- User-friendly UI for adding income and expenses
-- Dashboard with analytics and category breakdown
-- Expense tracking by categories
-- Recent transactions list
+- User Authentication (Register/Login)
+- Transaction Management
+- Category Management 
+- Account Management
+- Dashboard with expense analytics
+- RDS PostgreSQL Database
 
 ## Tech Stack
 
-- **Frontend**: React.js with Tailwind CSS
-- **State Management**: React Hooks (useState)
+- **Frontend**: React, Vite
+- **Backend**: Node.js, Express
+- **Database**: PostgreSQL
 
+## Prerequisites
 
-## Getting Started
+- Node.js (v16+)
+- npm
+- PostgreSQL database (or connection to a remote PostgreSQL database)
 
-### Prerequisites
+## Setup and Installation
 
-- Node.js (v14 or higher)
-- npm (v6 or higher)
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/saurabh12571257/Expense_Tracker.git
+   cd Expense_Tracker
+   ```
 
-### Installation
+2. **Install dependencies**
+   ```bash
+   # Install root dependencies
+   npm install
+   
+   # Install backend dependencies
+   cd tracker-backend
+   npm install
+   cd ..
+   ```
 
-1. Clone the repository
-```bash
-git clone https://github.com/yourusername/expense-tracker.git
-cd expense-tracker
-```
+3. **Configure environment variables**
+   ```bash
+   # Copy the example environment file
+   cp .env.example .env
+   
+   # Update with your database credentials
+   nano .env
+   ```
 
-2. Install dependencies
-```bash
-npm install
-```
+4. **Build the frontend**
+   ```bash
+   npm run build
+   ```
 
-3. Start the development server
+5. **Start the application**
+   ```bash
+   npm start
+   ```
+
+   The application will be available at `http://localhost:5002`
+
+## Development Mode
+
+To run the application in development mode with hot reloading:
+
 ```bash
 npm run dev
 ```
 
-4. Open your browser and navigate to `http://localhost:5173`
+This will start both the frontend development server and the backend server concurrently.
 
-## Project Structure
+- Frontend will be available at: `http://localhost:5173`
+- Backend API will be available at: `http://localhost:5002/api`
 
-```
-expense-tracker/
-├── public/
-├── src/
-│   ├── App.jsx         # Main application component
-│   ├── Login.jsx       # Login component
-│   ├── Register.jsx    # Registration component
-│   ├── index.css       # Global styles with Tailwind directives
-│   └── main.jsx        # Application entry point
-├── index.html
-├── package.json
-├── tailwind.config.js  # Tailwind CSS configuration
-└── README.md
-```
+## API Endpoints
 
-## Future Enhancements
+- `/api/auth` - Authentication routes
+- `/api/transactions` - Transaction management
+- `/api/categories` - Category management
+- `/api/accounts` - Account management
+- `/api/profile` - User profile management
 
-- User authentication
-- Data persistence with backend integration
-- Budget setting and alerts
-- Export reports as PDF/CSV
-- Mobile app version
+## License
 
-## Docker Deployment
-
-This application can be easily deployed using Docker:
-
-1. **Prerequisites**
-   - Docker
-   - Docker Compose
-
-2. **Setup**
-   ```bash
-   # Clone the repository
-   git clone https://github.com/saurabh12571257/Expense_Tracker.git
-   cd Expense_Tracker
-
-   # Create environment files from templates
-   cp .env.example .env
-   cp tracker-backend/.env.example tracker-backend/.env
-   
-   # Edit tracker-backend/.env to add your database credentials
-   nano tracker-backend/.env
-   ```
-
-3. **Deploy**
-   ```bash
-   docker-compose up -d
-   ```
-
-4. **Access**
-   - Frontend: http://localhost
-   - Backend API: http://localhost/api
-
-For more details, see [DOCKER-GUIDE.md](DOCKER-GUIDE.md).
+MIT

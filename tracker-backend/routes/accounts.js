@@ -6,7 +6,6 @@ const auth = require('../middleware/auth');
 // Get all accounts for a user
 router.get('/', auth, async (req, res) => {
   try {
-   
     const userId = req.user.id;
     
     const accountsResult = await pool.query(
@@ -25,7 +24,6 @@ router.get('/', auth, async (req, res) => {
     
     res.json({ accounts });
   } catch (err) {
-    console.error(err.message);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -63,7 +61,6 @@ router.put('/:id/savings-goal', auth, async (req, res) => {
       }
     });
   } catch (err) {
-    console.error(err.message);
     res.status(500).json({ message: 'Server error' });
   }
 });

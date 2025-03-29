@@ -4,10 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev:frontend": "vite",
     "build": "vite build",
     "lint": "eslint ./src --ext js,jsx --report-unused-disable-directives --max-warnings 0 || true",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev:backend": "cd tracker-backend && nodemon server.js",
+    "start:backend": "cd tracker-backend && node server.js",
+    "start": "npm run build && npm run start:backend",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\""
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -26,6 +30,7 @@
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.21",
+    "concurrently": "^8.2.2",
     "eslint": "^9.21.0",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^5.1.0",

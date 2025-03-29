@@ -22,11 +22,8 @@ function Register({ onRegister }) {
     try {
       console.log('Attempting registration with:', { email });
       
-      // Use environment variable or fallback to localhost
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5002';
-      console.log('Using API URL:', `${apiUrl}/api/auth/register`);
-      
-      const response = await fetch(`${apiUrl}/api/auth/register`, {
+      // Use the proxy URL for API requests
+      const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

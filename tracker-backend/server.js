@@ -1,45 +1,36 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
 
-// CORS configuration - place this BEFORE other middleware
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-auth-token');
-  
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-  
-  next();
-});
+// CORS configuration for development
+app.use(cors());
 
-// Other middleware
+// Middleware
 app.use(express.json());
 
-// Test route
-app.get('/test-cors', (req, res) => {
-  console.log('Test CORS route hit');
-  res.json({ message: 'CORS test successful' });
-});
-
-// Routes
+// API Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/transactions', require('./routes/transactions'));
 app.use('/api/categories', require('./routes/categories'));
 app.use('/api/accounts', require('./routes/accounts'));
 app.use('/api/profile', require('./routes/profile'));
 
-// Default route
-app.get('/', (req, res) => {
-  res.send('Expense Tracker API is running');
+// Serve static files from the React app
+const distPath = path.join(__dirname, '../dist');
+app.use(express.static(distPath));
+
+// The "catchall" handler: for any request that doesn't
+// match one above, send back the index.html file.
+app.get('*', (req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'));
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5002;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Frontend available at http://localhost:${PORT}`);
+  console.log(`API available at http://localhost:${PORT}/api/*`);
 });

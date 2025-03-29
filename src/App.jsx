@@ -3,16 +3,11 @@ import Login from './Login'
 import Register from './Register'
 
 function App() {
-  // Authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  // eslint-disable-next-line no-unused-vars
   const [userEmail, setUserEmail] = useState('');
   const [showRegister, setShowRegister] = useState(false);
   const [token, setToken] = useState('');
-  // eslint-disable-next-line no-unused-vars
   const [isLoading, setIsLoading] = useState(false);
-  
-  // Reset data to zero values
   const [balance, setBalance] = useState(0);
   const [income, setIncome] = useState(0);
   const [expenses, setExpenses] = useState(0);
@@ -21,19 +16,14 @@ function App() {
   const [isEditIncomeModalOpen, setIsEditIncomeModalOpen] = useState(false);
   const [editBalanceValue, setEditBalanceValue] = useState('');
   const [editIncomeValue, setEditIncomeValue] = useState('');
-  
-  // Add savings goal state
   const [savingsGoal, setSavingsGoal] = useState(1000);
   const [isEditSavingsGoalModalOpen, setIsEditSavingsGoalModalOpen] = useState(false);
   const [editSavingsGoalValue, setEditSavingsGoalValue] = useState('');
-  
-  // Add user state for profile
   const [user, setUser] = useState({
     name: 'John Doe',
     initials: 'JD',
     profileColor: 'bg-indigo-700'
   });
-  
   const [newTransaction, setNewTransaction] = useState({
     description: '',
     amount: '',
@@ -41,13 +31,9 @@ function App() {
     date: new Date().toISOString().split('T')[0],
     type: 'expense'
   });
-  // Empty recent transactions
   const [recentTransactions, setRecentTransactions] = useState([]);
-  
-  // Initial empty categories
   const [categories, setCategories] = useState([]);
 
-  // Category colors mapping
   const categoryColors = {
     'Housing': 'bg-blue-500',
     'Food': 'bg-green-500',
@@ -56,7 +42,6 @@ function App() {
     'Others': 'bg-red-500'
   };
 
-  // Available expense categories for dropdown
   const availableCategories = [
     'Housing',
     'Food',
@@ -65,61 +50,40 @@ function App() {
     'Others'
   ];
 
-  const updateCategoriesFromTransactions = useCallback(() => {
-    // Filter out income transactions
-    const expenseTransactions = recentTransactions.filter(transaction => transaction.amount < 0);
-    
-    // Calculate total expenses
-    const totalExpenses = expenseTransactions.reduce((sum, transaction) => sum + Math.abs(transaction.amount), 0);
-    
-    // Group expenses by category
-    const categoryMap = {};
-    expenseTransactions.forEach(transaction => {
-      const category = transaction.category;
-      if (!categoryMap[category]) {
-        categoryMap[category] = 0;
-      }
-      categoryMap[category] += Math.abs(transaction.amount);
-    });
-    
-    // Create updated categories array
-    const updatedCategories = Object.keys(categoryMap).map(name => {
-      const amount = categoryMap[name];
-      const percentage = totalExpenses > 0 ? Math.round((amount / totalExpenses) * 100) : 0;
-      return {
-        name,
-        amount,
-        percentage,
-        color: categoryColors[name] || 'bg-gray-500' // Default color if not in mapping
-      };
-    });
-    
-    // Sort by amount (highest first)
-    updatedCategories.sort((a, b) => b.amount - a.amount);
-    
-    setCategories(updatedCategories);
-  }, [recentTransactions, categoryColors]);
-
-  // Update categories whenever transactions change
   useEffect(() => {
-    updateCategoriesFromTransactions();
-  }, [recentTransactions, categoryColors]);
-
-  // Check for existing token on component mount
-  useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    if (storedToken) {
-      setToken(storedToken);
-      fetchUserData(storedToken);
+    if (recentTransactions.length > 0) {
+      const expenseTransactions = recentTransactions.filter(transaction => transaction.amount < 0);
+      const totalExpenses = expenseTransactions.reduce((sum, transaction) => sum + Math.abs(transaction.amount), 0);
+      
+      const categoryMap = {};
+      expenseTransactions.forEach(transaction => {
+        const category = transaction.category;
+        if (!categoryMap[category]) {
+          categoryMap[category] = 0;
+        }
+        categoryMap[category] += Math.abs(transaction.amount);
+      });
+      
+      const updatedCategories = Object.keys(categoryMap).map(name => {
+        const amount = categoryMap[name];
+        const percentage = totalExpenses > 0 ? Math.round((amount / totalExpenses) * 100) : 0;
+        return {
+          name,
+          amount,
+          percentage,
+          color: categoryColors[name] || 'bg-gray-500'
+        };
+      });
+      
+      updatedCategories.sort((a, b) => b.amount - a.amount);
+      setCategories(updatedCategories);
     }
-  }, []);
+  }, [recentTransactions]);
 
-  // Fetch user data from the backend
-  const fetchUserData = async (authToken) => {
+  const fetchUserData = useCallback(async (authToken) => {
     setIsLoading(true);
     try {
-      // Fetch user profile
-      const profileResponse = await fetch('http://localhost:5002/api/profile', {
+      const profileResponse = await fetch('/api/profile', {
         headers: {
           'x-auth-token': authToken
         }
@@ -127,12 +91,9 @@ function App() {
       
       if (profileResponse.ok) {
         const profileData = await profileResponse.json();
-        
-        // Extract user email and other profile information
         const userData = profileData.user || {};
         setUserEmail(userData.email || '');
         
-        // Extract initials from email
         const emailName = userData.email ? userData.email.split('@')[0] : '';
         const initials = emailName.substring(0, 2).toUpperCase();
         
@@ -145,8 +106,7 @@ function App() {
         setIsAuthenticated(true);
       }
       
-      // Fetch user transactions
-      const transactionsResponse = await fetch('http://localhost:5002/api/transactions', {
+      const transactionsResponse = await fetch('/api/transactions', {
         headers: {
           'x-auth-token': authToken
         }
@@ -157,7 +117,6 @@ function App() {
         if (transactionsData.transactions) {
           setRecentTransactions(transactionsData.transactions);
           
-          // Calculate balance, income, and expenses from transactions
           let totalIncome = 0;
           let totalExpenses = 0;
           
@@ -175,8 +134,7 @@ function App() {
         }
       }
       
-      // Fetch user's savings goal
-      const accountsResponse = await fetch('http://localhost:5002/api/accounts', {
+      const accountsResponse = await fetch('/api/accounts', {
         headers: {
           'x-auth-token': authToken
         }
@@ -185,7 +143,6 @@ function App() {
       if (accountsResponse.ok) {
         const accountsData = await accountsResponse.json();
         if (accountsData.accounts && accountsData.accounts.length > 0) {
-          // Assuming the first account has the savings goal
           setSavingsGoal(accountsData.accounts[0].savings_goal || 1000);
         }
       }
@@ -195,7 +152,15 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) {
+      setToken(storedToken);
+      fetchUserData(storedToken);
+    }
+  }, [fetchUserData]);
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -212,20 +177,19 @@ function App() {
     });
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
     setNewTransaction(prev => ({
       ...prev,
       [name]: value
     }));
-  };
+  }, []);
 
   const handleAddTransaction = async () => {
     if (!newTransaction.description || !newTransaction.amount || !newTransaction.category) {
       return;
     }
     
-    // Convert amount to number and make it positive (the type field will determine if it's income or expense)
     const amount = Math.abs(parseFloat(newTransaction.amount));
     
     try {
@@ -246,21 +210,17 @@ function App() {
       
       if (response.ok) {
         const data = await response.json();
-        
-        // Add the new transaction to the state
         const updatedTransactions = [data.transaction, ...recentTransactions];
         setRecentTransactions(updatedTransactions);
         
-        // Update balance, income, and expenses
         if (data.transaction.amount > 0) {
           setIncome(income + data.transaction.amount);
           setBalance(balance + data.transaction.amount);
         } else {
           setExpenses(expenses + Math.abs(data.transaction.amount));
-          setBalance(balance + data.transaction.amount); // amount is negative for expenses
+          setBalance(balance + data.transaction.amount);
         }
         
-        // Reset the form
         setNewTransaction({
           description: '',
           amount: '',
@@ -269,10 +229,7 @@ function App() {
           type: 'expense'
         });
         
-        // Close the modal
         setIsModalOpen(false);
-      } else {
-        console.error('Failed to add transaction');
       }
     } catch (error) {
       console.error('Error adding transaction:', error);
@@ -314,17 +271,13 @@ function App() {
       return;
     }
     
-    // Calculate the difference to update the balance
     const difference = newIncome - income;
-    
-    // Update income and balance
     setIncome(newIncome);
     setBalance(prevBalance => prevBalance + difference);
     
     handleCloseEditIncomeModal();
   };
 
-  // Add handlers for savings goal
   const handleOpenEditSavingsGoalModal = () => {
     setEditSavingsGoalValue(savingsGoal.toFixed(2));
     setIsEditSavingsGoalModalOpen(true);
@@ -342,7 +295,6 @@ function App() {
     const newSavingsGoal = parseFloat(editSavingsGoalValue);
     
     try {
-      // Get the first account (assuming it's the primary account)
       const accountsResponse = await fetch('http://localhost:5002/api/accounts', {
         headers: {
           'x-auth-token': token
@@ -354,7 +306,6 @@ function App() {
         if (accountsData.accounts && accountsData.accounts.length > 0) {
           const accountId = accountsData.accounts[0].id;
           
-          // Update the savings goal
           const response = await fetch(`http://localhost:5002/api/accounts/${accountId}/savings-goal`, {
             method: 'PUT',
             headers: {
@@ -378,13 +329,11 @@ function App() {
     }
   };
 
-  // Calculate savings progress
   const calculateSavingsProgress = () => {
     const progress = (balance / savingsGoal) * 100;
-    return Math.min(Math.max(progress, 0), 100); // Clamp between 0 and 100
+    return Math.min(Math.max(progress, 0), 100);
   };
 
-  // Handle login
   const handleLogin = (userData) => {
     const authToken = localStorage.getItem('token');
     setToken(authToken);
@@ -392,11 +341,9 @@ function App() {
     if (authToken) {
       fetchUserData(authToken);
     } else {
-      // Fallback if token is not available
       setIsAuthenticated(true);
       setUserEmail(userData.email);
       
-      // Extract initials from email
       const emailName = userData.email.split('@')[0];
       const initials = emailName.substring(0, 2).toUpperCase();
       
@@ -408,14 +355,12 @@ function App() {
     }
   };
 
-  // Handle logout
   const handleLogout = () => {
     setIsAuthenticated(false);
     setUserEmail('');
     setToken('');
     localStorage.removeItem('token');
     
-    // Reset user data
     setBalance(0);
     setIncome(0);
     setExpenses(0);
@@ -423,24 +368,18 @@ function App() {
     setSavingsGoal(1000);
   };
 
-  // Handle register
   const handleRegister = (userData) => {
     if (userData) {
-      // If userData is provided, it means registration was successful
-      // Automatically log in the user
       handleLogin(userData);
     } else {
-      // If userData is null, it means the user clicked "Sign in" on the register page
       setShowRegister(false);
     }
   };
 
-  // Handle register click from login page
   const handleRegisterClick = () => {
     setShowRegister(true);
   };
 
-  // If not authenticated, show login or register screen
   if (!isAuthenticated) {
     if (showRegister) {
       return <Register onRegister={handleRegister} />;
@@ -451,12 +390,10 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
-              {/* Profile Button */}
               <button className="flex items-center justify-center w-10 h-10 rounded-full text-white font-medium text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors" 
                 style={{ backgroundColor: '#4f46e5' }}>
                 {user.initials}
@@ -470,7 +407,6 @@ function App() {
               >
                 Add Transaction
               </button>
-              {/* Logout Button */}
               <button 
                 className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors flex items-center"
                 onClick={handleLogout}
@@ -485,7 +421,6 @@ function App() {
         </div>
       </header>
 
-      {/* Transaction Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
@@ -611,7 +546,6 @@ function App() {
         </div>
       )}
 
-      {/* Edit Balance Modal */}
       {isEditBalanceModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
@@ -662,7 +596,6 @@ function App() {
         </div>
       )}
 
-      {/* Edit Income Modal */}
       {isEditIncomeModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
@@ -713,7 +646,6 @@ function App() {
         </div>
       )}
 
-      {/* Edit Savings Goal Modal */}
       {isEditSavingsGoalModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
@@ -730,7 +662,7 @@ function App() {
             </div>
             
             <div className="space-y-4">
-      <div>
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Savings Goal Amount</label>
                 <input
                   type="number"
@@ -765,11 +697,8 @@ function App() {
         </div>
       )}
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {/* Balance Card */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-medium text-gray-500">Current Balance</h2>
@@ -791,7 +720,6 @@ function App() {
             </div>
           </div>
 
-          {/* Income Card */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-medium text-gray-500">Total Income</h2>
@@ -813,7 +741,6 @@ function App() {
             </div>
           </div>
 
-          {/* Expenses Card */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-lg font-medium text-gray-500">Total Expenses</h2>
             <p className="text-3xl font-bold text-red-600 mt-2">₹{expenses.toFixed(2)}</p>
@@ -828,9 +755,7 @@ function App() {
           </div>
         </div>
 
-        {/* Analytics Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Expense Breakdown */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Expense Breakdown</h2>
             <div className="space-y-4">
@@ -852,9 +777,8 @@ function App() {
                 </div>
               )}
             </div>
-      </div>
+          </div>
 
-          {/* Savings Goal Tracker */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold text-gray-800">Savings Goal Tracker</h2>
@@ -863,7 +787,7 @@ function App() {
                 onClick={handleOpenEditSavingsGoalModal}
               >
                 Edit Goal
-        </button>
+              </button>
             </div>
             
             <div className="mb-4">
@@ -908,7 +832,6 @@ function App() {
           </div>
         </div>
 
-        {/* Recent Transactions */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold text-gray-800">Recent Transactions</h2>
@@ -946,7 +869,7 @@ function App() {
           </div>
         </div>
       </main>
-      </div>
+    </div>
   )
 }
 

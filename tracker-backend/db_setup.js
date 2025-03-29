@@ -46,11 +46,26 @@ const createTables = async () => {
         user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
         name VARCHAR(100) NOT NULL,
         balance DECIMAL(12, 2) DEFAULT 0,
-        savings_goal DECIMAL(12, 2) DEFAULT 1000,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
     console.log('Accounts table created or already exists');
+
+    // Add savings_goal column to accounts table if it doesn't exist
+    await pool.query(`
+      DO $$ 
+      BEGIN 
+        IF NOT EXISTS (
+          SELECT 1 
+          FROM information_schema.columns 
+          WHERE table_name = 'accounts' 
+          AND column_name = 'savings_goal'
+        ) THEN
+          ALTER TABLE accounts ADD COLUMN savings_goal DECIMAL(12, 2) DEFAULT 1000;
+        END IF;
+      END $$;
+    `);
+    console.log('Checked/Added savings_goal column to accounts table');
 
     // Create transactions table
     await pool.query(`
