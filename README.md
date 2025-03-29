@@ -83,7 +83,3 @@ This will start both the frontend development server and the backend server conc
 - `/api/categories` - Category management
 - `/api/accounts` - Account management
 - `/api/profile` - User profile management
-
-## License
-
-MIT
